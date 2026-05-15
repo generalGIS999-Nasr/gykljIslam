@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="مشروع تخرج - إعادة تأهيل وتجميع نموذج متكامل لمحرك محأكات - المعهد الفني للمنشآت البحرية ببورسعيد">
+    <meta name="keywords" content="محركات بحرية, ميكنة السفن, مشروع تخرج, بورسعيد, محرك محأكات">
+    <meta name="author" content="فريق المشروع">
+    <meta name="theme-color" content="#030810">
+    <meta property="og:title" content="إعادة تأهيل محرك محأكات | مشروع تخرج">
+    <meta property="og:description" content="مشروع تخرج - إعادة تأهيل وتجميع نموذج متكامل لمحرك محأكات - المعهد الفني للمنشآت البحرية ببورسعيد">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="ar_EG">
+    <title>إعادة تأهيل محرك محأكات | مشروع تخرج</title>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    
+    <style>
+        :root {
+            --bg-deep: #030810;
+            --bg-primary: #081220;
+            --bg-secondary: #0c1c34;
+            --fg-primary: #e8f4f8;
+            --fg-muted: #9bb5c8;
+            --accent-cyan: #00e5c0;
+            --accent-gold: #f0b000;
+            --accent-blue: #0099ee;
+            --accent-red: #ff5555;
+            --gradient-primary: linear-gradient(135deg, var(--accent-cyan), var(--accent-gold));
+            --gradient-dark: linear-gradient(180deg, var(--bg-deep), var(--bg-primary));
+            --card-bg: rgba(12, 28, 52, 0.85);
+            --border-color: rgba(0, 229, 192, 0.25);
+            --glow-cyan: rgba(0, 229, 192, 0.5);
+            --glow-gold: rgba(240, 176, 0, 0.5);
+            --section-padding: 6rem;
+            --card-padding: 2.5rem;
+            --card-radius: 20px;
+            --transition-fast: 0.3s ease;
+            --transition-medium: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; scroll-padding-top: 100px; }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg-deep); color: var(--fg-primary); overflow-x: hidden; line-height: 1.8; }
+        .font-display { font-family: 'Tajawal', sans-serif; }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+        
+        /* Loader */
+        #loader { position: fixed; inset: 0; z-index: 9999; background: var(--bg-deep); display: flex; align-items: center; justify-content: center; transition: opacity 0.5s ease; }
+        .loader-spinner { width: 50px; height: 50px; border: 3px solid rgba(0, 229, 192, 0.2); border-top-color: var(--accent-cyan); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        
+        .ambient-orb { position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0; opacity: 0.4; animation: orbFloat 20s ease-in-out infinite; }
+        .orb-1 { width: 400px; height: 400px; background: radial-gradient(circle, var(--accent-cyan), transparent 70%); top: -100px; right: -100px; }
+        .orb-2 { width: 350px; height: 350px; background: radial-gradient(circle, var(--accent-gold), transparent 70%); bottom: 20%; left: -100px; animation-delay: -7s; }
+        .orb-3 { width: 300px; height: 300px; background: radial-gradient(circle, var(--accent-blue), transparent 70%); top: 50%; right: 10%; animation-delay: -14s; }
+        
+        @keyframes orbFloat { 0%, 100% { transform: translate(0, 0) scale(1); } 25% { transform: translate(30px, -20px) scale(1.1); } 50% { transform: translate(-20px, 30px) scale(0.95); } 75% { transform: translate(20px, 20px) scale(1.05); } }
+        
+        .noise-overlay { position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.03; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); }
+        .main-content { position: relative; z-index: 2; }
+        
+        .nav-fixed { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(3, 8, 16, 0.95); backdrop-filter: blur(20px); padding: 1rem 2rem; transform: translateY(-100%); transition: var(--transition-medium); border-bottom: 1px solid var(--border-color); }
+        .nav-fixed.visible { transform: translateY(0); }
+        .nav-logo { font-family: 'Tajawal', sans-serif; font-weight: 900; font-size: 1.2rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .nav-logo-img { width: 55px; height: 55px; object-fit: contain; border-radius: 50%; transition: transform 0.3s ease; filter: drop-shadow(0 0 8px rgba(0, 229, 192, 0.3)); }
+        .nav-logo-img:hover { transform: scale(1.1) rotate(5deg); filter: drop-shadow(0 0 15px rgba(0, 229, 192, 0.5)); }
+        .nav-links { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; }
+        .nav-link { color: var(--fg-muted); text-decoration: none; font-size: 0.9rem; transition: var(--transition-fast); position: relative; padding: 0.5rem 0; }
+        .nav-link:hover { color: var(--accent-cyan); }
+        .nav-link::after { content: ''; position: absolute; bottom: 0; right: 0; width: 0; height: 2px; background: var(--accent-cyan); transition: var(--transition-fast); }
+        .nav-link:hover::after { width: 100%; }
+        .mobile-menu-btn { display: none; background: none; border: none; color: var(--fg-primary); font-size: 1.5rem; cursor: pointer; padding: 0.5rem; }
+        
+        .progress-bar { position: fixed; top: 0; left: 0; height: 4px; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-gold), var(--accent-cyan)); background-size: 200% 100%; animation: progressGradient 3s linear infinite; z-index: 1000; width: 0%; transition: width 0.1s linear; }
+        @keyframes progressGradient { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
+        
+        .hero-section { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 2rem; position: relative; }
+        .hero-title { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 900; background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-gold) 50%, var(--accent-cyan) 100%); background-size: 200% 200%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 1.5rem; line-height: 1.4; animation: gradientShift 8s ease-in-out infinite; }
+        @keyframes gradientShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+        .hero-quote { font-size: clamp(1.15rem, 2.5vw, 1.5rem); color: var(--accent-gold); max-width: 750px; line-height: 2.2; margin-bottom: 1.5rem; font-weight: 600; }
+        .hero-description { font-size: clamp(1rem, 2vw, 1.2rem); color: var(--fg-muted); max-width: 850px; line-height: 2.2; margin-bottom: 2.5rem; }
+        .scroll-indicator { position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%); animation: bounce 2.5s infinite; }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); } 40% { transform: translateX(-50%) translateY(-15px); } 60% { transform: translateX(-50%) translateY(-8px); } }
+        
+        .section { padding: var(--section-padding) 2rem; position: relative; }
+        .section-alt { background: linear-gradient(180deg, transparent, rgba(0, 229, 192, 0.02), transparent); }
+        .section-gold { background: linear-gradient(180deg, transparent, rgba(240, 176, 0, 0.02), transparent); }
+        .section-title { font-size: clamp(1.8rem, 4.5vw, 2.8rem); font-weight: 700; color: var(--accent-cyan); margin-bottom: 2.5rem; position: relative; display: inline-block; }
+        .section-title::after { content: ''; position: absolute; bottom: -12px; right: 0; width: 70%; height: 4px; background: linear-gradient(90deg, var(--accent-cyan), transparent); border-radius: 2px; }
+        .section-subtitle { font-size: 1.5rem; font-weight: 700; color: var(--accent-gold); margin-bottom: 1.5rem; }
+        
+        .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--card-radius); padding: var(--card-padding); backdrop-filter: blur(15px); transition: var(--transition-medium); position: relative; overflow: hidden; }
+        .card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(0, 229, 192, 0.05), transparent 50%); opacity: 0; transition: var(--transition-medium); }
+        .card:hover { transform: translateY(-8px) scale(1.01); border-color: var(--accent-cyan); box-shadow: 0 25px 60px rgba(0, 229, 192, 0.15), 0 0 40px rgba(0, 229, 192, 0.08); }
+        .card:hover::before { opacity: 1; }
+        .card-simple { padding: 1.5rem; border-radius: 16px; background: rgba(0, 0, 0, 0.25); border: 1px solid transparent; transition: var(--transition-fast); }
+        .card-simple:hover { background: rgba(0, 229, 192, 0.08); border-color: var(--border-color); transform: translateX(-5px); }
+        
+        .btn-primary { background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue)); color: var(--bg-deep); padding: 1.1rem 2.8rem; border-radius: 60px; font-weight: 700; font-size: 1.15rem; border: none; cursor: pointer; transition: var(--transition-medium); position: relative; overflow: hidden; box-shadow: 0 8px 30px rgba(0, 229, 192, 0.3); }
+        .btn-primary::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); transition: left 0.6s ease; }
+        .btn-primary:hover::before { left: 100%; }
+        .btn-primary:hover { transform: scale(1.08) translateY(-3px); box-shadow: 0 15px 40px var(--glow-cyan); }
+        .btn-primary:active { transform: scale(1.02); }
+        .btn-secondary { background: transparent; color: var(--accent-cyan); padding: 1.1rem 2.8rem; border-radius: 60px; font-weight: 700; font-size: 1.15rem; border: 2px solid var(--accent-cyan); cursor: pointer; transition: var(--transition-medium); }
+        .btn-secondary:hover { background: var(--accent-cyan); color: var(--bg-deep); transform: scale(1.08) translateY(-3px); box-shadow: 0 15px 40px var(--glow-cyan); }
+        .btn-primary:focus-visible, .btn-secondary:focus-visible, .nav-link:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 4px; }
+        
+        .quote-box { font-size: 1.2rem; color: var(--fg-muted); line-height: 2.2; border-right: 4px solid var(--accent-gold); padding-right: 2rem; position: relative; }
+        .quote-box::before { content: '"'; position: absolute; top: -10px; right: -5px; font-size: 4rem; color: var(--accent-gold); opacity: 0.2; font-family: 'Tajawal', serif; }
+        
+        .timeline { position: relative; padding-right: 35px; }
+        .timeline::before { content: ''; position: absolute; right: 8px; top: 0; bottom: 0; width: 4px; background: linear-gradient(180deg, var(--accent-cyan), var(--accent-gold), var(--accent-cyan)); border-radius: 2px; }
+        .timeline-item { position: relative; margin-bottom: 1.5rem; padding-right: 2.5rem; }
+        .timeline-item::before { content: ''; position: absolute; right: 0; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; background: var(--bg-deep); border: 3px solid var(--accent-cyan); border-radius: 50%; box-shadow: 0 0 25px var(--glow-cyan); transition: var(--transition-fast); }
+        .timeline-item:hover::before { background: var(--accent-cyan); box-shadow: 0 0 35px var(--glow-cyan), 0 0 15px var(--accent-cyan); }
+        
+        .stroke-engine { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; }
+        .stroke-item { text-align: center; padding: 2.5rem 2rem; border-radius: var(--card-radius); background: var(--card-bg); border: 1px solid var(--border-color); transition: var(--transition-medium); position: relative; overflow: hidden; }
+        .stroke-item::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 50% 0%, rgba(0, 229, 192, 0.1), transparent 60%); opacity: 0; transition: var(--transition-medium); }
+        .stroke-item:hover { border-color: var(--accent-gold); transform: translateY(-10px) scale(1.02); box-shadow: 0 30px 60px rgba(240, 176, 0, 0.15); }
+        .stroke-item:hover::before { opacity: 1; }
+        .stroke-number { font-size: 5rem; font-weight: 900; opacity: 0.08; position: absolute; top: -15px; right: 15px; color: var(--accent-cyan); font-family: 'Tajawal', sans-serif; }
+        
+        .engine-animation { width: 140px; height: 140px; margin: 0 auto 1.5rem; position: relative; }
+        .cylinder { width: 60px; height: 100px; border: 3px solid var(--accent-cyan); border-radius: 12px; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); background: linear-gradient(180deg, rgba(0, 229, 192, 0.05), transparent); box-shadow: inset 0 0 20px rgba(0, 229, 192, 0.1); }
+        .piston { width: 48px; height: 70px; background: linear-gradient(180deg, var(--accent-cyan), var(--accent-blue)); border-radius: 6px; position: absolute; left: 50%; transform: translateX(-50%); animation: piston-move 2s ease-in-out infinite; box-shadow: 0 5px 20px rgba(0, 229, 192, 0.3); }
+        @keyframes piston-move { 0%, 100% { top: 8px; } 50% { top: 58px; } }
+        .spark { position: absolute; width: 8px; height: 8px; background: var(--accent-gold); border-radius: 50%; left: 50%; top: 20px; transform: translateX(-50%); opacity: 0; animation: spark 2s ease-in-out infinite; box-shadow: 0 0 15px var(--accent-gold); }
+        @keyframes spark { 0%, 45%, 55%, 100% { opacity: 0; transform: translateX(-50%) scale(0); } 50% { opacity: 1; transform: translateX(-50%) scale(1.5); } }
+        .exhaust-container { position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 50px; height: 40px; }
+        .exhaust-particle { position: absolute; width: 8px; height: 8px; background: rgba(255, 150, 50, 0.8); border-radius: 50%; bottom: 0; animation: exhaustPuff 2s ease-out infinite; }
+        .exhaust-particle:nth-child(1) { left: 10px; animation-delay: 0s; }
+        .exhaust-particle:nth-child(2) { left: 20px; animation-delay: 0.15s; }
+        .exhaust-particle:nth-child(3) { left: 30px; animation-delay: 0.3s; }
+        @keyframes exhaustPuff { 0% { opacity: 0; transform: translateY(0) scale(0.5); } 50% { opacity: 0; transform: translateY(0) scale(0.5); } 60% { opacity: 0.9; transform: translateY(5px) scale(1); } 80% { opacity: 0.7; transform: translateY(20px) scale(1.2); } 100% { opacity: 0; transform: translateY(35px) scale(0.8); } }
+        
+        .comparison-card.before { background: linear-gradient(135deg, rgba(220, 50, 50, 0.08), transparent); border-color: rgba(220, 80, 80, 0.3); }
+        .comparison-card.before:hover { border-color: rgba(220, 80, 80, 0.6); box-shadow: 0 25px 60px rgba(220, 50, 50, 0.15); }
+        .comparison-card.after { background: linear-gradient(135deg, rgba(0, 229, 192, 0.08), transparent); }
+        .comparison-card.after:hover { box-shadow: 0 25px 60px rgba(0, 229, 192, 0.2); }
+        
+        .tech-tag { display: inline-block; padding: 0.6rem 1.8rem; background: rgba(0, 229, 192, 0.08); border: 1px solid var(--accent-cyan); border-radius: 50px; font-size: 0.95rem; margin: 0.3rem; transition: var(--transition-medium); cursor: default; }
+        .tech-tag:hover { background: var(--accent-cyan); color: var(--bg-deep); transform: translateY(-3px) scale(1.05); box-shadow: 0 10px 25px var(--glow-cyan); }
+        
+        .video-section { background: linear-gradient(180deg, transparent, rgba(0, 229, 192, 0.05), transparent); padding: 5rem 2rem; }
+        .video-container { max-width: 1100px; margin: 0 auto; }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 20px; border: 2px solid var(--accent-cyan); box-shadow: 0 30px 80px rgba(0, 229, 192, 0.2); transition: var(--transition-medium); background: linear-gradient(135deg, #0a1520, #1a2a3a); }
+        .video-wrapper:hover { transform: translateY(-5px); box-shadow: 0 40px 100px rgba(0, 229, 192, 0.3); }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; border-radius: 18px; }
+        .video-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition-fast); }
+        .video-placeholder:hover .play-button { transform: scale(1.1); box-shadow: 0 0 60px rgba(0, 229, 192, 0.5); }
+        .play-button { width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue)); display: flex; align-items: center; justify-content: center; transition: var(--transition-medium); box-shadow: 0 0 40px rgba(0, 229, 192, 0.4); }
+        .play-button svg { margin-right: -3px; }
+        
+        .play-button-gold { background: linear-gradient(135deg, var(--accent-gold), #ff9500); box-shadow: 0 0 40px rgba(240, 176, 0, 0.4); }
+        .video-placeholder:hover .play-button-gold { box-shadow: 0 0 60px rgba(240, 176, 0, 0.5); }
+        .video-wrapper-gold { border-color: var(--accent-gold); box-shadow: 0 30px 80px rgba(240, 176, 0, 0.2); }
+        .video-wrapper-gold:hover { box-shadow: 0 40px 100px rgba(240, 176, 0, 0.3); }
+        
+        .videos-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 2.5rem; }
+        @media (max-width: 1024px) { .videos-grid { grid-template-columns: 1fr; } }
+        
+        .video-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 24px; overflow: hidden; transition: var(--transition-medium); }
+        .video-card:hover { transform: translateY(-8px); border-color: var(--accent-cyan); box-shadow: 0 30px 60px rgba(0, 229, 192, 0.15); }
+        .video-card-gold:hover { border-color: var(--accent-gold); box-shadow: 0 30px 60px rgba(240, 176, 0, 0.15); }
+        
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem; }
+        .gallery-item { aspect-ratio: 16/10; background: var(--card-bg); border-radius: 16px; overflow: hidden; position: relative; cursor: pointer; transition: var(--transition-medium); border: 1px solid var(--border-color); }
+        .gallery-item:hover { transform: scale(1.05) translateY(-5px); box-shadow: 0 30px 60px rgba(0, 229, 192, 0.2); border-color: var(--accent-cyan); }
+        .gallery-item::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 50%, rgba(0, 0, 0, 0.85)); z-index: 1; }
+        .gallery-label { position: absolute; bottom: 1.2rem; right: 1.2rem; z-index: 2; font-size: 1rem; color: var(--fg-primary); font-weight: 600; }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+        .gallery-item:hover img { transform: scale(1.1); }
+        
+        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; }
+        .team-member { text-align: center; padding: 1.5rem; background: var(--card-bg); border-radius: var(--card-radius); border: 1px solid var(--border-color); transition: var(--transition-medium); }
+        .team-member:hover { border-color: var(--accent-gold); transform: translateY(-8px) scale(1.03); box-shadow: 0 20px 50px rgba(240, 176, 0, 0.15); }
+        .member-avatar { width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-gold)); margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 900; color: var(--bg-deep); box-shadow: 0 8px 25px rgba(0, 229, 192, 0.3); transition: var(--transition-medium); }
+        .team-member:hover .member-avatar { transform: scale(1.1) rotate(5deg); box-shadow: 0 12px 35px rgba(0, 229, 192, 0.4); }
+        
+        .leaders-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; margin-bottom: 3rem; }
+        .leader-card { text-align: center; padding: 2rem; background: linear-gradient(135deg, rgba(12, 28, 52, 0.9), rgba(20, 40, 70, 0.8)); border-radius: 24px; border: 2px solid transparent; background-clip: padding-box; position: relative; transition: var(--transition-medium); }
+        .leader-card::before { content: ''; position: absolute; inset: -2px; border-radius: 26px; background: linear-gradient(135deg, var(--accent-gold), var(--accent-cyan)); z-index: -1; opacity: 0.5; transition: var(--transition-medium); }
+        .leader-card:hover { transform: translateY(-10px) scale(1.02); box-shadow: 0 30px 60px rgba(0, 229, 192, 0.2); }
+        .leader-card:hover::before { opacity: 1; }
+        .leader-photo { width: 130px; height: 130px; border-radius: 50%; margin: 0 auto 1.2rem; position: relative; overflow: hidden; border: 4px solid var(--accent-gold); box-shadow: 0 0 40px rgba(240, 176, 0, 0.5), 0 15px 50px rgba(0, 0, 0, 0.6); transition: var(--transition-medium); background: linear-gradient(135deg, #1a2a3a, #0a1520); }
+        .leader-photo::before { content: ''; position: absolute; inset: -4px; border-radius: 50%; background: conic-gradient(from 0deg, var(--accent-gold), var(--accent-cyan), var(--accent-gold), var(--accent-cyan), var(--accent-gold)); z-index: -1; animation: rotateBorder 3s linear infinite; }
+        @keyframes rotateBorder { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .leader-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; transition: transform 0.5s ease; }
+        .leader-card:hover .leader-photo { transform: scale(1.08); box-shadow: 0 0 60px rgba(240, 176, 0, 0.7), 0 20px 60px rgba(0, 0, 0, 0.7); }
+        .leader-card:hover .leader-photo img { transform: scale(1.05); }
+        .leader-photo-cyan { border-color: var(--accent-cyan); box-shadow: 0 0 40px rgba(0, 229, 192, 0.5), 0 15px 50px rgba(0, 0, 0, 0.6); }
+        .leader-photo-cyan::before { background: conic-gradient(from 0deg, var(--accent-cyan), var(--accent-gold), var(--accent-cyan), var(--accent-gold), var(--accent-cyan)); }
+        
+        .supervisor-card { padding: 1.8rem; border-radius: 16px; margin-bottom: 1rem; transition: var(--transition-medium); }
+        .supervisor-card:hover { transform: translateY(-5px); }
+        .supervisor-gold { background: rgba(240, 176, 0, 0.08); border: 1px solid rgba(240, 176, 0, 0.3); }
+        .supervisor-gold:hover { box-shadow: 0 20px 40px rgba(240, 176, 0, 0.15); }
+        .supervisor-cyan { background: rgba(0, 229, 192, 0.08); border: 1px solid rgba(0, 229, 192, 0.3); }
+        .supervisor-cyan:hover { box-shadow: 0 20px 40px rgba(0, 229, 192, 0.15); }
+        
+        .task-card { padding: 1.5rem; border-radius: 16px; transition: var(--transition-fast); }
+        .task-card:hover { transform: translateY(-3px); }
+        .task-cyan { background: rgba(0, 229, 192, 0.08); border: 1px solid rgba(0, 229, 192, 0.2); }
+        .task-gold { background: rgba(240, 176, 0, 0.08); border: 1px solid rgba(240, 176, 0, 0.2); }
+        .task-blue { background: rgba(0, 153, 238, 0.08); border: 1px solid rgba(0, 153, 238, 0.2); }
+        
+        .footer { padding: 4rem 2rem; background: var(--bg-primary); border-top: 1px solid var(--border-color); text-align: center; }
+        
+        .reveal { opacity: 0; transform: translateY(60px); transition: var(--transition-slow); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        
+        /* Back to top button */
+        #backToTop { position: fixed; bottom: 2rem; left: 2rem; width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue)); border: none; cursor: pointer; z-index: 50; opacity: 0; transform: translateY(20px); transition: all 0.3s ease; box-shadow: 0 5px 20px rgba(0, 229, 192, 0.3); display: flex; align-items: center; justify-content: center; }
+        #backToTop:hover { transform: translateY(-3px) scale(1.1); box-shadow: 0 10px 30px rgba(0, 229, 192, 0.5); }
+        
+        @media (max-width: 1024px) { .stroke-engine { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 768px) { .stroke-engine { grid-template-columns: 1fr; } .mobile-menu-btn { display: block; } .nav-links { display: none; flex-direction: column; text-align: center; padding: 1rem 0; } .nav-links.active { display: flex; } .nav-logo-img { width: 42px; height: 42px; } .section { padding: 4rem 1.5rem; } .card { padding: 1.5rem; } .leaders-grid { grid-template-columns: 1fr; } .videos-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 480px) { .hero-section { padding: 1.5rem; } .gallery-grid { grid-template-columns: 1fr; } }
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
+        .english-text { direction: ltr; display: inline-block; }
+    </style>
+</head>
+<body>
+    <!-- Loader -->
+    <div id="loader">
+        <div class="loader-spinner"></div>
+    </div>
+
+    <div class="progress-bar" id="progressBar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+    
+    <div class="ambient-orb orb-1" aria-hidden="true"></div>
+    <div class="ambient-orb orb-2" aria-hidden="true"></div>
+    <div class="ambient-orb orb-3" aria-hidden="true"></div>
+    <div class="noise-overlay" aria-hidden="true"></div>
+    <canvas id="bg-canvas" aria-hidden="true"></canvas>
+    
+    <nav class="nav-fixed" id="navbar" role="navigation" aria-label="القائمة الرئيسية">
+        <div class="flex justify-between items-center max-w-7xl mx-auto">
+            <div class="flex items-center gap-3">
+                <img src="https://z-cdn-media.chatglm.cn/files/645a1964-cb34-4186-88ca-700736b73e50.png?auth_key=1878888361-991e5d1c390942f4a710ee6919ec50d0-0-36765c0f202fc33b1131582f20a65717" 
+                     alt="شعار المعهد الفني للمنشآت البحرية" 
+                     class="nav-logo-img">
+                <span class="nav-logo">مشروع التخرج</span>
+            </div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="فتح القائمة" aria-expanded="false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+            <div class="nav-links" id="navLinks">
+                <a href="#hero" class="nav-link">الرئيسية</a>
+                <a href="#intro" class="nav-link">المجال</a>
+                <a href="#videos" class="nav-link">الفيديوهات</a>
+                <a href="#about" class="nav-link">القسم والمعهد</a>
+                <a href="#project" class="nav-link">المشروع</a>
+                <a href="#strokes" class="nav-link">الأشواط</a>
+                <a href="#challenges" class="nav-link">التحديات</a>
+                <a href="#comparison" class="nav-link">قبل وبعد</a>
+                <a href="#gallery" class="nav-link">المعرض</a>
+                <a href="#team" class="nav-link">الفريق</a>
+            </div>
+        </div>
+    </nav>
+    
+    <main class="main-content">
+        <!-- HERO SECTION -->
+        <section id="hero" class="hero-section" aria-labelledby="hero-title">
+            <div class="max-w-5xl mx-auto">
+                <h1 id="hero-title" class="hero-title font-display reveal">إعادة تأهيل وتجميع نموذج متكامل لمحرك محأكات</h1>
+                <p class="hero-quote reveal" style="transition-delay: 0.1s;">"في عالم لا تتوقف فيه المحركات عن الدوران…<br>كان علينا أن نعيد الحياة لمحرك توقف عن العمل."</p>
+                <p class="hero-description reveal" style="transition-delay: 0.2s;">مشروع تخرج يهدف إلى إعادة تأهيل محرك محأكات وتحويله إلى نموذج تعليمي تفاعلي يجمع بين الميكانيكا، الكهرباء، البرمجة، والمحاكاة العملية.</p>
+                <div class="flex flex-wrap gap-4 justify-center mt-10 reveal" style="transition-delay: 0.3s;">
+                    <button class="btn-primary" data-scroll-to="project">ابدأ الرحلة</button>
+                    <button class="btn-secondary" data-scroll-to="videos">مشاهدة الفيديوهات</button>
+                </div>
+            </div>
+            <div class="scroll-indicator" aria-hidden="true">
+                <svg width="32" height="55" viewBox="0 0 32 55" fill="none">
+                    <rect x="2" y="2" width="28" height="51" rx="14" stroke="var(--accent-cyan)" stroke-width="2"/>
+                    <circle cx="16" cy="16" r="6" fill="var(--accent-cyan)">
+                        <animate attributeName="cy" values="16;38;16" dur="2.5s" repeatCount="indefinite"/>
+                        <animate attributeName="opacity" values="1;0.5;1" dur="2.5s" repeatCount="indefinite"/>
+                    </circle>
+                </svg>
+            </div>
+        </section>
+        
+        <!-- INTRODUCTION SECTION -->
+        <section id="intro" class="section section-alt" aria-labelledby="intro-title">
+            <div class="max-w-4xl mx-auto">
+                <h2 id="intro-title" class="section-title reveal">عالم المحركات البحرية</h2>
+                <div class="card reveal">
+                    <div class="quote-box">
+                        <p class="mb-5">"مجال المحركات البحرية ليس مجرد أجزاء تدور أو محرك يعمل… بل منظومة كاملة تعتمد على الدقة، القوة، والانضباط.</p>
+                        <p class="mb-5">داخل كل سفينة يوجد عالم خفي يعمل بلا توقف، يبدأ من غرفة المحركات، حيث تتحول الطاقة إلى حركة، والحركة إلى رحلة كاملة فوق البحر.</p>
+                        <p class="mb-5">ويُعد تخصص ميكنة وتشغيل السفن من أهم التخصصات البحرية التي تهتم بفهم وتشغيل وصيانة المحركات وأنظمة الدفع المختلفة، بالإضافة إلى التعامل مع الأعطال والأنظمة الكهربائية والميكانيكية داخل السفن.</p>
+                        <p>ومن هنا جاءت فكرة مشروعنا… ليس فقط لإصلاح محرك تالف، بل لإعادة تقديم هذا العالم بصورة تعليمية تفاعلية تجمع بين الميكانيكا، الكهرباء، البرمجة، والتقنيات الحديثة."</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- VIDEOS SECTION -->
+        <section id="videos" class="video-section" aria-labelledby="videos-title">
+            <div class="video-container">
+                <h2 id="videos-title" class="section-title reveal text-center" style="display: block;">فيديوهات المشروع</h2>
+                
+                <div class="videos-grid">
+                    <div class="video-card reveal">
+                        <div style="padding: 1.5rem;">
+                            <h3 class="text-xl font-bold mb-2" style="color: var(--accent-cyan);">فيديو تعريفي للمشروع</h3>
+                            <p style="color: var(--fg-muted); font-size: 0.95rem;">شاهد الفيديو التعريفي الذي يوضح مراحل المشروع من البداية حتى النهاية.</p>
+                        </div>
+                        <div class="video-wrapper" id="videoWrapper1">
+                            <div class="video-placeholder" data-video-id="SfclxbXAjmo" tabindex="0" role="button" aria-label="تشغيل الفيديو التعريفي">
+                                <div class="play-button">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="video-card video-card-gold reveal" style="transition-delay: 0.15s;">
+                        <div style="padding: 1.5rem;">
+                            <h3 class="text-xl font-bold mb-2" style="color: var(--accent-gold);">فيديو شرح مكونات المحرك</h3>
+                            <p style="color: var(--fg-muted); font-size: 0.95rem;">شرح تفصيلي لمكونات المحرك وكيفية عمل كل جزء.</p>
+                        </div>
+                        <div class="video-wrapper video-wrapper-gold" id="videoWrapper2">
+                            <div class="video-placeholder" data-video-id="ER7UX9XkbSA" tabindex="0" role="button" aria-label="تشغيل فيديو شرح المكونات">
+                                <div class="play-button play-button-gold">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- ABOUT SECTION -->
+        <section id="about" class="section" aria-labelledby="about-title">
+            <div class="max-w-6xl mx-auto">
+                <h2 id="about-title" class="section-title reveal sr-only">القسم والمعهد</h2>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <article class="card reveal">
+                        <h3 class="section-subtitle">قسم ميكنة وتشغيل السفن</h3>
+                        <p class="leading-relaxed mb-5" style="color: var(--fg-muted);">يهتم القسم بدراسة المحركات البحرية وأنظمة التشغيل والصيانة داخل السفن، بالإضافة إلى تدريب الطلاب عمليًا على كيفية التعامل مع الأعطال وأنظمة الدفع البحري المختلفة.</p>
+                        <p class="leading-relaxed" style="color: var(--fg-muted);">ويهدف القسم إلى إعداد كوادر فنية قادرة على العمل بكفاءة داخل المجال البحري من خلال الدمج بين الدراسة النظرية والتطبيق العملي.</p>
+                    </article>
+                    <article class="card reveal" style="transition-delay: 0.2s;">
+                        <h3 class="section-subtitle">المعهد الفني للمنشآت البحرية ببورسعيد</h3>
+                        <p class="leading-relaxed mb-5" style="color: var(--fg-muted);">يُعد المعهد من المؤسسات التعليمية المتخصصة في المجال البحري، حيث يهدف إلى تأهيل الطلاب علميًا وعمليًا للعمل في مجالات النقل البحري، تشغيل السفن، وصيانة المحركات والأنظمة البحرية المختلفة.</p>
+                        <p class="leading-relaxed" style="color: var(--fg-muted);">ويعتمد المعهد على التدريب العملي والتطبيقات الواقعية لتنمية مهارات الطلاب وتأهيلهم لسوق العمل.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+        
+        <!-- PROJECT SECTION -->
+        <section id="project" class="section section-alt" aria-labelledby="project-title">
+            <div class="max-w-6xl mx-auto">
+                <h2 id="project-title" class="section-title reveal">فكرة المشروع</h2>
+                <div class="card mb-10 reveal">
+                    <h3 class="section-subtitle">إعادة تأهيل وتجميع نموذج متكامل لمحرك محأكات</h3>
+                    <p class="leading-relaxed mb-5" style="color: var(--fg-muted);">بدأت فكرة المشروع من خلال العمل على مشروع محرك بحري قديم ومتوقف عن التشغيل، حيث قمنا بفك جميع المكونات وفحص الأجزاء الداخلية وإعادة صيانتها وتجميعها مرة أخرى.</p>
+                    <p class="leading-relaxed mb-5" style="color: var(--fg-muted);">ولم يقتصر المشروع على إعادة تشغيل المحرك فقط، بل تم تطويره وتحويله إلى نموذج تعليمي تفاعلي يساعد على شرح مكونات المحرك وآلية عمله بصورة عملية مبسطة.</p>
+                    <p class="leading-relaxed" style="color: var(--fg-muted);">كما تم دمج الإضاءة، المؤثرات الصوتية، والبرمجة التفاعلية لإخراج المشروع بصورة حديثة تجمع بين التعليم والتكنولوجيا.</p>
+                </div>
+                
+                <h3 class="text-2xl font-bold mb-8 reveal" style="color: var(--accent-cyan);">مراحل إعادة التأهيل</h3>
+                <div class="timeline mb-14" role="list">
+                    <div class="timeline-item card reveal" role="listitem"><h4 class="font-bold" style="color: var(--accent-cyan);">فك جميع أجزاء المحرك بالكامل</h4></div>
+                    <div class="timeline-item card reveal" style="transition-delay: 0.05s;" role="listitem"><h4 class="font-bold" style="color: var(--accent-cyan);">تنظيف وصيانة المكونات الداخلية</h4></div>
+                    <div class="timeline-item card reveal" style="transition-delay: 0.1s;" role="listitem"><h4 class="font-bold" style="color: var(--accent-cyan);">فحص الأجزاء التالفة واستبدال اللازم</h4></div>
+                    <div class="timeline-item card reveal" style="transition-delay: 0.15s;" role="listitem"><h4 class="font-bold" style="color: var(--accent-cyan);">إعادة تجميع المحرك</h4></div>
+                    <div class="timeline-item card reveal" style="transition-delay: 0.2s;" role="listitem"><h4 class="font-bold" style="color: var(--accent-cyan);">تطوير الشكل الخارجي</h4></div>
+                    <div class="timeline-item card reveal" style="transition-delay: 0.25s;" role="listitem"><h4 class="font-bold" style="color: var(--accent-gold);">إعادة تشغيل المحرك</h4></div>
+                    <div class="timeline-item card reveal" style="transition-delay: 0.3s;" role="listitem"><h4 class="font-bold" style="color: var(--accent-gold);">تطوير النظام الكهربائي</h4></div>
+                    <div class="timeline-item card reveal" style="transition-delay: 0.35s;" role="listitem"><h4 class="font-bold" style="color: var(--accent-gold);">إضافة الإضاءة والمؤثرات</h4></div>
+                    <div class="timeline-item card reveal" style="transition-delay: 0.4s;" role="listitem"><h4 class="font-bold" style="color: var(--accent-gold);">برمجة النظام التفاعلي</h4></div>
+                    <div class="timeline-item card reveal" style="transition-delay: 0.45s;" role="listitem"><h4 class="font-bold" style="color: var(--accent-gold);">التشغيل النهائي واختبار الأداء</h4></div>
+                </div>
+                
+                <h3 class="text-2xl font-bold mb-8 reveal" style="color: var(--accent-cyan);">أهداف المشروع</h3>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="card text-center reveal"><div class="text-4xl mb-4 font-display font-black" style="color: var(--accent-gold);">01</div><p class="text-lg">إعادة الاستفادة من نموذج محرك تالف</p></div>
+                    <div class="card text-center reveal" style="transition-delay: 0.1s;"><div class="text-4xl mb-4 font-display font-black" style="color: var(--accent-gold);">02</div><p class="text-lg">تحويل المحرك إلى وسيلة تعليمية تفاعلية</p></div>
+                    <div class="card text-center reveal" style="transition-delay: 0.15s;"><div class="text-4xl mb-4 font-display font-black" style="color: var(--accent-gold);">03</div><p class="text-lg">تبسيط شرح المحركات البحرية للطلاب</p></div>
+                    <div class="card text-center reveal" style="transition-delay: 0.2s;"><div class="text-4xl mb-4 font-display font-black" style="color: var(--accent-cyan);">04</div><p class="text-lg">الدمج بين الميكانيكا والكهرباء والبرمجة</p></div>
+                    <div class="card text-center reveal" style="transition-delay: 0.25s;"><div class="text-4xl mb-4 font-display font-black" style="color: var(--accent-cyan);">05</div><p class="text-lg">تطوير أسلوب عرض المشاريع العملية</p></div>
+                    <div class="card text-center reveal" style="transition-delay: 0.3s;"><div class="text-4xl mb-4 font-display font-black" style="color: var(--accent-cyan);">06</div><p class="text-lg">تقديم نموذج حديث يجمع بين التعليم والتكنولوجيا</p></div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- FOUR STROKES SECTION -->
+        <section id="strokes" class="section" aria-labelledby="strokes-title">
+            <div class="max-w-6xl mx-auto">
+                <h2 id="strokes-title" class="section-title reveal">الأشواط الأربعة للمحرك</h2>
+                <div class="stroke-engine">
+                    <article class="stroke-item reveal" aria-label="شوط السحب">
+                        <span class="stroke-number" aria-hidden="true">1</span>
+                        <div class="engine-animation" aria-hidden="true"><div class="cylinder"></div><div class="piston"></div></div>
+                        <h3 class="text-xl font-bold mb-3" style="color: var(--accent-cyan);">شوط السحب</h3>
+                        <p style="color: var(--fg-muted);">في هذا الشوط يتحرك المكبس إلى أسفل داخل الأسطوانة، مما يسمح بدخول خليط الهواء والوقود إلى غرفة الاحتراق.</p>
+                    </article>
+                    <article class="stroke-item reveal" style="transition-delay: 0.1s;" aria-label="شوط الضغط">
+                        <span class="stroke-number" aria-hidden="true">2</span>
+                        <div class="engine-animation" aria-hidden="true"><div class="cylinder"></div><div class="piston" style="animation-delay: 0.5s;"></div></div>
+                        <h3 class="text-xl font-bold mb-3" style="color: var(--accent-gold);">شوط الضغط</h3>
+                        <p style="color: var(--fg-muted);">يتحرك المكبس إلى أعلى ليقوم بضغط خليط الهواء والوقود داخل الأسطوانة لتهيئته لعملية الاحتراق.</p>
+                    </article>
+                    <article class="stroke-item reveal" style="transition-delay: 0.2s;" aria-label="شوط القدرة">
+                        <span class="stroke-number" aria-hidden="true">3</span>
+                        <div class="engine-animation" aria-hidden="true"><div class="cylinder"></div><div class="piston" style="animation-delay: 1s;"></div><div class="spark"></div></div>
+                        <h3 class="text-xl font-bold mb-3" style="color: var(--accent-cyan);">شوط القدرة</h3>
+                        <p style="color: var(--fg-muted);">تحدث عملية الاحتراق داخل غرفة الاحتراق، مما يؤدي إلى دفع المكبس بقوة إلى أسفل وتوليد القدرة اللازمة لتشغيل المحرك.</p>
+                    </article>
+                    <article class="stroke-item reveal" style="transition-delay: 0.3s;" aria-label="شوط العادم">
+                        <span class="stroke-number" aria-hidden="true">4</span>
+                        <div class="engine-animation" aria-hidden="true"><div class="cylinder"></div><div class="piston" style="animation-delay: 1.5s;"></div><div class="exhaust-container"><div class="exhaust-particle"></div><div class="exhaust-particle"></div><div class="exhaust-particle"></div></div></div>
+                        <h3 class="text-xl font-bold mb-3" style="color: var(--accent-gold);">شوط العادم</h3>
+                        <p style="color: var(--fg-muted);">يرتفع المكبس مرة أخرى إلى أعلى لطرد الغازات الناتجة عن عملية الاحتراق خارج الأسطوانة.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+        
+        <!-- CHALLENGES SECTION -->
+        <section id="challenges" class="section section-gold" aria-labelledby="challenges-title">
+            <div class="max-w-6xl mx-auto">
+                <h2 id="challenges-title" class="section-title reveal sr-only">التحديات والتعلم</h2>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="card reveal">
+                        <h3 class="text-2xl font-bold mb-7" style="color: var(--accent-red);">التحديات التي واجهتنا</h3>
+                        <div class="card-simple flex items-start gap-4"><svg class="w-6 h-6 flex-shrink-0 mt-1" style="color: var(--accent-red);" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg><span>وجود تلف في بعض أجزاء المحرك</span></div>
+                        <div class="card-simple flex items-start gap-4"><svg class="w-6 h-6 flex-shrink-0 mt-1" style="color: var(--accent-red);" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg><span>صعوبة إعادة التشغيل بعد فترة توقف طويلة</span></div>
+                        <div class="card-simple flex items-start gap-4"><svg class="w-6 h-6 flex-shrink-0 mt-1" style="color: var(--accent-red);" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg><span>تطوير النظام الكهربائي بما يتناسب مع المشروع</span></div>
+                        <div class="card-simple flex items-start gap-4"><svg class="w-6 h-6 flex-shrink-0 mt-1" style="color: var(--accent-red);" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg><span>الدمج بين الجانب الميكانيكي والبرمجي</span></div>
+                        <div class="card-simple flex items-start gap-4"><svg class="w-6 h-6 flex-shrink-0 mt-1" style="color: var(--accent-red);" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg><span>ضيق الوقت أثناء مراحل التنفيذ</span></div>
+                        <div class="card-simple flex items-start gap-4"><svg class="w-6 h-6 flex-shrink-0 mt-1" style="color: var(--accent-red);" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg><span>إخراج المشروع بصورة تعليمية وتفاعلية</span></div>
+                    </div>
+                    <div class="card reveal" style="transition-delay: 0.2s;">
+                        <h3 class="text-2xl font-bold mb-7" style="color: var(--accent-cyan);">ماذا تعلمنا من المشروع؟</h3>
+                        <div class="card-simple flex items-start gap-4"><svg class="w-6 h-6 flex-shrink-0 mt-1" style="color: var(--accent-cyan);" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg><span>أهمية العمل الجماعي</span></div>
+                        <div class="card-simple flex items-start gap-4"><svg class="w-6 h-6 flex-shrink-0 mt-1" style="color: var(--accent-cyan);" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg><span>كيفية حل المشكلات العملية</span></div>
+                        <div class="card-simple flex items-start gap-4"><svg class="w-6 h-6 flex-shrink-0 mt-1" style="color: var(--accent-cyan);" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg><span>تطوير مهارات الصيانة والتشغيل</span></div>
+                        <div class="card-simple flex items-start gap-4"><svg class="w-6 h-6 flex-shrink-0 mt-1" style="color: var(--accent-cyan);" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg><span>الدمج بين أكثر من تخصص داخل مشروع واحد</span></div>
+                        <div class="card-simple flex items-start gap-4"><svg class="w-6 h-6 flex-shrink-0 mt-1" style="color: var(--accent-cyan);" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg><span>تحمل ضغط التنفيذ والعمل الميداني</span></div>
+                        <div class="card-simple flex items-start gap-4"><svg class="w-6 h-6 flex-shrink-0 mt-1" style="color: var(--accent-cyan);" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg><span>أهمية التطوير والابتكار في المشاريع التعليمية</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- COMPARISON SECTION -->
+        <section id="comparison" class="section" aria-labelledby="comparison-title">
+            <div class="max-w-6xl mx-auto">
+                <h2 id="comparison-title" class="section-title reveal">قبل وبعد التطوير</h2>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="comparison-card before card reveal">
+                        <h3 class="text-2xl font-bold mb-7" style="color: var(--accent-red);">قبل التطوير</h3>
+                        <ul class="space-y-5">
+                            <li class="flex items-center gap-4"><svg class="w-6 h-6 flex-shrink-0" style="color: var(--accent-red);" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg><span class="text-lg">المحرك متوقف عن التشغيل</span></li>
+                            <li class="flex items-center gap-4"><svg class="w-6 h-6 flex-shrink-0" style="color: var(--accent-red);" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg><span class="text-lg">وجود أجزاء تالفة</span></li>
+                            <li class="flex items-center gap-4"><svg class="w-6 h-6 flex-shrink-0" style="color: var(--accent-red);" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg><span class="text-lg">الشكل الخارجي غير مناسب</span></li>
+                            <li class="flex items-center gap-4"><svg class="w-6 h-6 flex-shrink-0" style="color: var(--accent-red);" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg><span class="text-lg">عدم وجود وسيلة شرح تفاعلية</span></li>
+                        </ul>
+                    </div>
+                    <div class="comparison-card after card reveal" style="transition-delay: 0.2s;">
+                        <h3 class="text-2xl font-bold mb-7" style="color: var(--accent-cyan);">بعد التطوير</h3>
+                        <ul class="space-y-5">
+                            <li class="flex items-center gap-4"><svg class="w-6 h-6 flex-shrink-0" style="color: var(--accent-cyan);" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg><span class="text-lg">إعادة تشغيل المحرك بالكامل</span></li>
+                            <li class="flex items-center gap-4"><svg class="w-6 h-6 flex-shrink-0" style="color: var(--accent-cyan);" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg><span class="text-lg">تطوير الشكل النهائي</span></li>
+                            <li class="flex items-center gap-4"><svg class="w-6 h-6 flex-shrink-0" style="color: var(--accent-cyan);" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg><span class="text-lg">إضافة نظام تفاعلي وإضاءة</span></li>
+                            <li class="flex items-center gap-4"><svg class="w-6 h-6 flex-shrink-0" style="color: var(--accent-cyan);" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg><span class="text-lg">تبسيط شرح آلية عمل المحرك</span></li>
+                            <li class="flex items-center gap-4"><svg class="w-6 h-6 flex-shrink-0" style="color: var(--accent-cyan);" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg><span class="text-lg">تحسين تجربة العرض العملي</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- TECHNOLOGY SECTION -->
+        <section id="tech" class="section section-alt" aria-labelledby="tech-title">
+            <div class="max-w-6xl mx-auto text-center">
+                <h2 id="tech-title" class="section-title reveal" style="display: inline-block;">التكنولوجيا المستخدمة</h2>
+                <div class="flex flex-wrap justify-center gap-4 mt-10 reveal">
+                    <span class="tech-tag">الأنظمة الكهربائية</span>
+                    <span class="tech-tag">البرمجة التفاعلية</span>
+                    <span class="tech-tag">المؤثرات الصوتية</span>
+                    <span class="tech-tag">أنظمة الإضاءة</span>
+                    <span class="tech-tag">المحاكاة التعليمية</span>
+                    <span class="tech-tag">الذكاء الاصطناعي</span>
+                    <span class="tech-tag">التصميم الجرافيكي والمونتاج</span>
+                </div>
+            </div>
+        </section>
+        
+        <!-- GALLERY SECTION -->
+        <section id="gallery" class="section" aria-labelledby="gallery-title">
+            <div class="max-w-6xl mx-auto">
+                <h2 id="gallery-title" class="section-title reveal">معرض الصور</h2>
+                <p class="text-lg mb-10 reveal" style="color: var(--fg-muted); max-width: 700px;">لحظات من رحلة إعادة تأهيل المحرك - من الفك والتجميع إلى التعلم والتعاون الجماعي</p>
+                <div class="gallery-grid">
+                    <div class="gallery-item reveal" tabindex="0" role="button" aria-label="التعلم والتعاون حول المحرك">
+                        <img src="WhatsApp%20Image%202026-05-09%20at%204.10.23%20PM.jpeg" alt="الفريق يتعلم ويتعاون حول المحرك أثناء مرحلة التشغيل والاختبار" loading="lazy">
+                        <span class="gallery-label">التعلم والتعاون حول المحرك</span>
+                    </div>
+                    <div class="gallery-item reveal" style="transition-delay: 0.1s;" tabindex="0" role="button" aria-label="فك وتجميع الأجزاء الميكانيكية">
+                        <img src="WhatsApp%20Image%202026-05-09%20at%204.10.25%20PM%20(3).jpeg" alt="الفريق يقوم بفك وتجميع الأجزاء الميكانيكية للمحرك باستخدام الأدوات" loading="lazy">
+                        <span class="gallery-label">فك وتجميع الأجزاء الميكانيكية</span>
+                    </div>
+                    <div class="gallery-item reveal" style="transition-delay: 0.2s;" tabindex="0" role="button" aria-label="الشرح العملي لمكونات المحرك">
+                        <img src="WhatsApp%20Image%202026-05-09%20at%204.10.25%20PM%20(4).jpeg" alt="الشرح العملي لمكونات المحرك والتعاون الفني بين أعضاء الفريق" loading="lazy">
+                        <span class="gallery-label">الشرح العملي لمكونات المحرك</span>
+                    </div>
+                    <div class="gallery-item reveal" style="transition-delay: 0.3s;" tabindex="0" role="button" aria-label="الصيانة والإصلاح">
+                        <img src="WhatsApp%20Image%202026-05-09%20at%204.10.25%20PM%20(5).jpeg" alt="عمليات الصيانة والإصلاح لأجزاء المحرك الداخلية" loading="lazy">
+                        <span class="gallery-label">الصيانة والإصلاح</span>
+                    </div>
+                    <div class="gallery-item reveal" style="transition-delay: 0.4s;" tabindex="0" role="button" aria-label="العمل الجماعي على المحرك">
+                        <img src="WhatsApp%20Image%202026-05-09%20at%204.10.26%20PM%20(1).jpeg" alt="العمل الجماعي على تجميع وإصلاح أجزاء المحرك" loading="lazy">
+                        <span class="gallery-label">العمل الجماعي على المحرك</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- TEAM SECTION -->
+        <section id="team" class="section section-gold" aria-labelledby="team-title">
+            <div class="max-w-6xl mx-auto">
+                <h2 id="team-title" class="section-title reveal">فريق العمل</h2>
+                
+                <div class="leaders-grid">
+                    <div class="leader-card reveal">
+                        <div class="leader-photo">
+                            <img src="https://z-cdn-media.chatglm.cn/files/96ad0215-4188-4b6e-a534-b964d223ce95.jpeg?auth_key=1878875034-9fa44e6f86204b78bb7b597d6bf71135-0-31b1c1caa244efc8c465acae0fa6e7fc" alt="اسلام دعدور - قائد الفريق" loading="lazy">
+                        </div>
+                        <h3 class="text-xl font-bold mb-1">اسلام دعدور</h3>
+                        <p class="text-sm font-semibold" style="color: var(--accent-gold);">قائد الفريق</p>
+                    </div>
+                    
+                    <div class="leader-card reveal" style="transition-delay: 0.1s;">
+                        <div class="leader-photo leader-photo-cyan">
+                            <div class="w-full h-full bg-gradient-to-br from-cyan-900/50 to-blue-900/50 flex items-center justify-center">
+                                <span class="text-4xl font-black" style="color: var(--accent-cyan);">م</span>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold mb-1">محمد ابراهيم صالح علي شاهين</h3>
+                        <p class="text-sm font-semibold" style="color: var(--accent-cyan);">المسئول عن البرمجة والكهرباء</p>
+                    </div>
+                </div>
+                
+                <div class="team-grid">
+                    <div class="team-member reveal" style="transition-delay: 0.05s;"><div class="member-avatar">ي</div><h3 class="text-sm font-bold mb-1">يوسف محمود عبد العاطي</h3></div>
+                    <div class="team-member reveal" style="transition-delay: 0.1s;"><div class="member-avatar">أ</div><h3 class="text-sm font-bold mb-1">احمد محمود سعد طه</h3></div>
+                    <div class="team-member reveal" style="transition-delay: 0.15s;"><div class="member-avatar">أ</div><h3 class="text-sm font-bold mb-1">ايمن محمد علي السيد</h3></div>
+                    <div class="team-member reveal" style="transition-delay: 0.2s;"><div class="member-avatar">ب</div><h3 class="text-sm font-bold mb-1">بلال محمد شربيني</h3></div>
+                    <div class="team-member reveal" style="transition-delay: 0.25s;"><div class="member-avatar">ز</div><h3 class="text-sm font-bold mb-1">زياد احمد علي بكر</h3></div>
+                    <div class="team-member reveal" style="transition-delay: 0.3s;"><div class="member-avatar">س</div><h3 class="text-sm font-bold mb-1">سمير محمد عبد العال</h3></div>
+                    <div class="team-member reveal" style="transition-delay: 0.35s;"><div class="member-avatar">ط</div><h3 class="text-sm font-bold mb-1">طه مسعد طه قاسم</h3></div>
+                    <div class="team-member reveal" style="transition-delay: 0.4s;"><div class="member-avatar">ع</div><h3 class="text-sm font-bold mb-1">عبد الرحمن السيد فتحي</h3></div>
+                    <div class="team-member reveal" style="transition-delay: 0.45s;"><div class="member-avatar">ع</div><h3 class="text-sm font-bold mb-1">عبد الرحمن محمد السيد</h3></div>
+                    <div class="team-member reveal" style="transition-delay: 0.5s;"><div class="member-avatar">م</div><h3 class="text-sm font-bold mb-1">محمد السيد محمد احمد</h3></div>
+                    <div class="team-member reveal" style="transition-delay: 0.55s;"><div class="member-avatar">م</div><h3 class="text-sm font-bold mb-1">محمد منصور عيد</h3></div>
+                    <div class="team-member reveal" style="transition-delay: 0.6s;"><div class="member-avatar">م</div><h3 class="text-sm font-bold mb-1">محمد مهران احمد</h3></div>
+                    <div class="team-member reveal" style="transition-delay: 0.65s;"><div class="member-avatar">م</div><h3 class="text-sm font-bold mb-1">محمود رضا فتحي</h3></div>
+                    <div class="team-member reveal" style="transition-delay: 0.7s;"><div class="member-avatar">م</div><h3 class="text-sm font-bold mb-1">محمود عرفة عبد المعاطي</h3></div>
+                    <div class="team-member reveal" style="transition-delay: 0.75s;"><div class="member-avatar">م</div><h3 class="text-sm font-bold mb-1">معاذ احمد عبد الله</h3></div>
+                    <div class="team-member reveal" style="transition-delay: 0.8s;"><div class="member-avatar">ي</div><h3 class="text-sm font-bold mb-1">ياسين هاني عبد الغفار</h3></div>
+                    <div class="team-member reveal" style="transition-delay: 0.85s;"><div class="member-avatar">ي</div><h3 class="text-sm font-bold mb-1">يوسف ابراهيم محمد</h3></div>
+                    <div class="team-member reveal" style="transition-delay: 0.9s;"><div class="member-avatar">ع</div><h3 class="text-sm font-bold mb-1">عبد الرحمن سليمان الغريب</h3></div>
+                </div>
+                
+                <div class="mt-14 card reveal">
+                    <h3 class="text-xl font-bold mb-7" style="color: var(--accent-gold);">توزيع المهام</h3>
+                    <div class="grid md:grid-cols-3 gap-5">
+                        <div class="task-card task-cyan"><h4 class="font-bold text-lg" style="color: var(--accent-cyan);">اعمال الفك والتجميع</h4></div>
+                        <div class="task-card task-gold"><h4 class="font-bold text-lg" style="color: var(--accent-gold);">الصيانة الميكانيكية</h4></div>
+                        <div class="task-card task-blue"><h4 class="font-bold text-lg" style="color: var(--accent-blue);">الانظمة الكهربائية</h4></div>
+                        <div class="task-card task-cyan"><h4 class="font-bold text-lg" style="color: var(--accent-cyan);">البرمجة التفاعلية</h4></div>
+                        <div class="task-card task-gold"><h4 class="font-bold text-lg" style="color: var(--accent-gold);">التصميم والمونتاج</h4></div>
+                        <div class="task-card task-blue"><h4 class="font-bold text-lg" style="color: var(--accent-blue);">التصوير والاخراج</h4></div>
+                        <div class="task-card task-cyan md:col-span-3"><h4 class="font-bold text-lg" style="color: var(--accent-cyan);">اعداد المحتوى والشرح</h4></div>
+                    </div>
+                </div>
+                
+                <div class="mt-10 card text-center reveal">
+                    <h3 class="text-xl font-bold mb-7" style="color: var(--accent-cyan);">اشراف المشروع</h3>
+                    <div class="supervisor-card supervisor-gold">
+                        <p class="text-xl font-bold mb-2" style="color: var(--accent-gold);">المهندسة سوزان مجدي</p>
+                        <p class="mb-2" style="color: var(--fg-muted);"><span class="english-text">Engineer Suzanne Magdy</span></p>
+                        <p class="font-semibold text-lg" style="color: var(--accent-cyan);">عميدة المعهد</p>
+                    </div>
+                    <div class="supervisor-card supervisor-cyan">
+                        <p class="text-xl font-bold mb-2" style="color: var(--accent-cyan);">المهندس محمد سامي</p>
+                        <p style="color: var(--fg-muted);">مشرف المشروع</p>
+                    </div>
+                    <div class="mt-8 pt-6 border-t" style="border-color: var(--border-color);">
+                        <p style="color: var(--fg-muted);">قسم ميكنة وتشغيل السفن</p>
+                        <p style="color: var(--fg-muted);">المعهد الفني للمنشآت البحرية ببورسعيد</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- CONCLUSION SECTION -->
+        <section class="section" aria-labelledby="conclusion-title">
+            <div class="max-w-4xl mx-auto">
+                <div class="card text-center reveal">
+                    <h2 id="conclusion-title" class="sr-only">الخاتمة</h2>
+                    <svg class="w-16 h-16 mx-auto mb-8 opacity-20" style="color: var(--accent-gold);" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+                    <p class="quote-box text-center mb-8">"لم يكن الهدف مجرد مشروع تخرج… بل تجربة حقيقية اثبتت ان التطوير لا يحتاج الى امكانيات ضخمة، بل الى فكرة، شغف، وفريق يؤمن بما يصنعه."</p>
+                    <p class="text-2xl font-bold" style="color: var(--accent-gold);">"من مجرد محرك متوقف… الى تجربة تعليمية متكاملة."</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- FOOTER -->
+        <footer class="footer" role="contentinfo">
+            <div class="max-w-4xl mx-auto">
+                <div class="mb-6">
+                    <img src="https://z-cdn-media.chatglm.cn/files/645a1964-cb34-4186-88ca-700736b73e50.png?auth_key=1878888361-991e5d1c390942f4a710ee6919ec50d0-0-36765c0f202fc33b1131582f20a65717" alt="شعار المعهد" style="width: 70px; height: 70px; object-fit: contain; margin: 0 auto 1rem; display: block; filter: drop-shadow(0 0 10px rgba(0, 229, 192, 0.3));">
+                </div>
+                <p class="text-xl mb-3 font-bold" style="color: var(--accent-cyan);">المعهد الفني للمنشآت البحرية ببورسعيد</p>
+                <p class="text-lg mb-8" style="color: var(--fg-muted);">قسم ميكنة وتشغيل السفن</p>
+                <div class="pt-8 border-t" style="border-color: var(--border-color);">
+                    <p class="text-sm" style="color: var(--fg-muted);">جميع الحقوق محفوظة 2026</p>
+                </div>
+            </div>
+        </footer>
+    </main>
+    
+    <!-- Back to Top Button -->
+    <button id="backToTop" aria-label="العودة للأعلى">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--bg-deep)" stroke-width="3"><path d="M18 15l-6-6-6 6"/></svg>
+    </button>
+    
+    <script type="module">
+        import * as THREE from 'three';
+        
+        const canvas = document.getElementById('bg-canvas');
+        const progressBar = document.getElementById('progressBar');
+        const navbar = document.getElementById('navbar');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const navLinks = document.getElementById('navLinks');
+        const backToTopBtn = document.getElementById('backToTop');
+        
+        let scene = null;
+        let camera = null;
+        let renderer = null;
+        let particles = null;
+        let mouseX = 0;
+        let mouseY = 0;
+        
+        const clock = new THREE.Clock();
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        
+        // Loader
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('loader');
+            if (loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.remove(), 500);
+            }
+        });
+        
+        function initThree() {
+            if (!canvas) return;
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 50;
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true, powerPreference: "high-performance" });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            
+            const particleCount = prefersReducedMotion ? 200 : 600;
+            const positions = new Float32Array(particleCount * 3);
+            const colors = new Float32Array(particleCount * 3);
+            const colorCyan = new THREE.Color('#00e5c0');
+            const colorGold = new THREE.Color('#f0b000');
+            const colorBlue = new THREE.Color('#0099ee');
+            
+            for (let i = 0; i < particleCount; i++) {
+                const i3 = i * 3;
+                positions[i3] = (Math.random() - 0.5) * 120;
+                positions[i3 + 1] = (Math.random() - 0.5) * 120;
+                positions[i3 + 2] = (Math.random() - 0.5) * 120;
+                const colorChoice = Math.random();
+                const selectedColor = colorChoice < 0.4 ? colorCyan : colorChoice < 0.7 ? colorGold : colorBlue;
+                colors[i3] = selectedColor.r;
+                colors[i3 + 1] = selectedColor.g;
+                colors[i3 + 2] = selectedColor.b;
+            }
+            
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            const material = new THREE.PointsMaterial({ size: 0.8, vertexColors: true, transparent: true, opacity: 0.7, sizeAttenuation: true, blending: THREE.AdditiveBlending });
+            particles = new THREE.Points(geometry, material);
+            scene.add(particles);
+            
+            if (!prefersReducedMotion) animate();
+            else renderer.render(scene, camera);
+        }
+        
+        function animate() {
+            if (prefersReducedMotion) return;
+            requestAnimationFrame(animate);
+            const time = clock.getElapsedTime();
+            if (particles && renderer && camera) {
+                particles.rotation.y = time * 0.03;
+                particles.rotation.x = Math.sin(time * 0.08) * 0.1;
+                particles.rotation.y += mouseX * 0.00005;
+                particles.rotation.x += mouseY * 0.00005;
+                renderer.render(scene, camera);
+            }
+        }
+        
+        function onWindowResize() {
+            if (camera && renderer) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        }
+        
+        function onMouseMove(event) {
+            if (prefersReducedMotion) return;
+            mouseX = event.clientX - window.innerWidth / 2;
+            mouseY = event.clientY - window.innerHeight / 2;
+        }
+        
+        function onScroll() {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = Math.max(0, Math.min(100, (scrollTop / docHeight) * 100));
+            progressBar.style.width = scrollPercent + '%';
+            progressBar.setAttribute('aria-valuenow', Math.round(scrollPercent));
+            
+            // Navbar visibility
+            if (scrollTop > 150) navbar.classList.add('visible');
+            else navbar.classList.remove('visible');
+            
+            // Back to top button
+            if (backToTopBtn) {
+                if (scrollTop > 500) {
+                    backToTopBtn.style.opacity = '1';
+                    backToTopBtn.style.transform = 'translateY(0)';
+                } else {
+                    backToTopBtn.style.opacity = '0';
+                    backToTopBtn.style.transform = 'translateY(20px)';
+                }
+            }
+        }
+        
+        function initScrollReveal() {
+            const revealElements = document.querySelectorAll('.reveal');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('active');
+                });
+            }, { threshold: 0.1, rootMargin: '0px 0px -80px 0px' });
+            revealElements.forEach(el => observer.observe(el));
+        }
+        
+        function initVideos() {
+            const videoPlaceholders = document.querySelectorAll('.video-placeholder');
+            
+            videoPlaceholders.forEach((placeholder) => {
+                const wrapper = placeholder.parentElement;
+                const videoId = placeholder.getAttribute('data-video-id');
+                let videoLoaded = false;
+                
+                if (!wrapper || !videoId) return;
+                
+                const loadVideo = () => {
+                    if (!videoLoaded) {
+                        const iframe = document.createElement('iframe');
+                        iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+                        const cardTitle = wrapper.closest('.video-card')?.querySelector('h3')?.textContent || 'فيديو المشروع';
+                        iframe.title = cardTitle;
+                        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+                        iframe.allowFullscreen = true;
+                        wrapper.appendChild(iframe);
+                        placeholder.style.display = 'none';
+                        videoLoaded = true;
+                    }
+                };
+                
+                placeholder.addEventListener('click', loadVideo);
+                placeholder.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        loadVideo();
+                    }
+                });
+            });
+        }
+        
+        function initMobileMenu() {
+            if (!mobileMenuBtn || !navLinks) return;
+            mobileMenuBtn.addEventListener('click', () => {
+                const isExpanded = navLinks.classList.toggle('active');
+                mobileMenuBtn.setAttribute('aria-expanded', isExpanded);
+            });
+        }
+        
+        function initSmoothScroll() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                        navLinks.classList.remove('active');
+                        mobileMenuBtn.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            });
+            
+            document.querySelectorAll('[data-scroll-to]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetId = btn.getAttribute('data-scroll-to');
+                    const target = document.getElementById(targetId);
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+        }
+        
+        function initBackToTop() {
+            if (!backToTopBtn) return;
+            backToTopBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+        
+        initThree();
+        initScrollReveal();
+        initVideos();
+        initMobileMenu();
+        initSmoothScroll();
+        initBackToTop();
+        
+        window.addEventListener('resize', onWindowResize);
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('scroll', onScroll);
+    </script>
+</body>
+</html>
