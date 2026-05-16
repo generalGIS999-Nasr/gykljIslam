@@ -7,17 +7,11 @@
     <meta name="keywords" content="محركات بحرية, ميكنة السفن, مشروع تخرج, بورسعيد, محرك محأكات">
     <meta name="author" content="فريق المشروع">
     <meta name="theme-color" content="#030810">
-    <meta property="og:title" content="إعادة تأهيل محرك محأكات | مشروع تخرج">
-    <meta property="og:description" content="مشروع تخرج - إعادة تأهيل وتجميع نموذج متكامل لمحرك محأكات - المعهد الفني للمنشآت البحرية ببورسعيد">
-    <meta property="og:type" content="website">
-    <meta property="og:locale" content="ar_EG">
     <title>إعادة تأهيل محرك محأكات | مشروع تخرج</title>
-    
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Tajawal:wght@200;400;500;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     
     <script type="importmap">
@@ -35,7 +29,7 @@
             --bg-primary: #081220;
             --bg-secondary: #0c1c34;
             --fg-primary: #e8f4f8;
-            --fg-muted: #9bb5c8;
+            --fg-muted: #8ba3b8;
             --accent-cyan: #00e5c0;
             --accent-gold: #f0b000;
             --accent-blue: #0099ee;
@@ -60,11 +54,6 @@
         .font-display { font-family: 'Tajawal', sans-serif; }
         .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
         
-        /* Loader */
-        #loader { position: fixed; inset: 0; z-index: 9999; background: var(--bg-deep); display: flex; align-items: center; justify-content: center; transition: opacity 0.5s ease; }
-        .loader-spinner { width: 50px; height: 50px; border: 3px solid rgba(0, 229, 192, 0.2); border-top-color: var(--accent-cyan); border-radius: 50%; animation: spin 0.8s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        
         #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
         
         .ambient-orb { position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0; opacity: 0.4; animation: orbFloat 20s ease-in-out infinite; }
@@ -80,8 +69,6 @@
         .nav-fixed { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(3, 8, 16, 0.95); backdrop-filter: blur(20px); padding: 1rem 2rem; transform: translateY(-100%); transition: var(--transition-medium); border-bottom: 1px solid var(--border-color); }
         .nav-fixed.visible { transform: translateY(0); }
         .nav-logo { font-family: 'Tajawal', sans-serif; font-weight: 900; font-size: 1.2rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .nav-logo-img { width: 55px; height: 55px; object-fit: contain; border-radius: 50%; transition: transform 0.3s ease; filter: drop-shadow(0 0 8px rgba(0, 229, 192, 0.3)); }
-        .nav-logo-img:hover { transform: scale(1.1) rotate(5deg); filter: drop-shadow(0 0 15px rgba(0, 229, 192, 0.5)); }
         .nav-links { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; }
         .nav-link { color: var(--fg-muted); text-decoration: none; font-size: 0.9rem; transition: var(--transition-fast); position: relative; padding: 0.5rem 0; }
         .nav-link:hover { color: var(--accent-cyan); }
@@ -161,33 +148,31 @@
         .tech-tag:hover { background: var(--accent-cyan); color: var(--bg-deep); transform: translateY(-3px) scale(1.05); box-shadow: 0 10px 25px var(--glow-cyan); }
         
         .video-section { background: linear-gradient(180deg, transparent, rgba(0, 229, 192, 0.05), transparent); padding: 5rem 2rem; }
-        .video-container { max-width: 1100px; margin: 0 auto; }
-        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 20px; border: 2px solid var(--accent-cyan); box-shadow: 0 30px 80px rgba(0, 229, 192, 0.2); transition: var(--transition-medium); background: linear-gradient(135deg, #0a1520, #1a2a3a); }
-        .video-wrapper:hover { transform: translateY(-5px); box-shadow: 0 40px 100px rgba(0, 229, 192, 0.3); }
-        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; border-radius: 18px; }
+        .video-container { max-width: 1000px; margin: 0 auto; }
+        
+        /* Video Cards Grid */
+        .videos-grid { display: flex; flex-direction: column; gap: 3rem; }
+        
+        .video-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 24px; overflow: hidden; transition: var(--transition-medium); }
+        .video-card:hover { transform: translateY(-8px); border-color: var(--accent-cyan); box-shadow: 0 25px 50px rgba(0, 229, 192, 0.15); }
+        .video-card-header { padding: 1.5rem 1.5rem 1rem; }
+        
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 0 0 22px 22px; background: linear-gradient(135deg, #0a1520, #1a2a3a); }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; border-radius: 0 0 22px 22px; }
         .video-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition-fast); }
         .video-placeholder:hover .play-button { transform: scale(1.1); box-shadow: 0 0 60px rgba(0, 229, 192, 0.5); }
-        .play-button { width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue)); display: flex; align-items: center; justify-content: center; transition: var(--transition-medium); box-shadow: 0 0 40px rgba(0, 229, 192, 0.4); }
-        .play-button svg { margin-right: -3px; }
+        .play-button { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue)); display: flex; align-items: center; justify-content: center; transition: var(--transition-medium); box-shadow: 0 0 40px rgba(0, 229, 192, 0.4); }
+        .play-button svg { margin-right: -4px; }
         
         .play-button-gold { background: linear-gradient(135deg, var(--accent-gold), #ff9500); box-shadow: 0 0 40px rgba(240, 176, 0, 0.4); }
         .video-placeholder:hover .play-button-gold { box-shadow: 0 0 60px rgba(240, 176, 0, 0.5); }
-        .video-wrapper-gold { border-color: var(--accent-gold); box-shadow: 0 30px 80px rgba(240, 176, 0, 0.2); }
-        .video-wrapper-gold:hover { box-shadow: 0 40px 100px rgba(240, 176, 0, 0.3); }
         
-        .videos-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 2.5rem; }
-        @media (max-width: 1024px) { .videos-grid { grid-template-columns: 1fr; } }
-        
-        .video-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 24px; overflow: hidden; transition: var(--transition-medium); }
-        .video-card:hover { transform: translateY(-8px); border-color: var(--accent-cyan); box-shadow: 0 30px 60px rgba(0, 229, 192, 0.15); }
-        .video-card-gold:hover { border-color: var(--accent-gold); box-shadow: 0 30px 60px rgba(240, 176, 0, 0.15); }
-        
-        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem; }
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2rem; }
         .gallery-item { aspect-ratio: 16/10; background: var(--card-bg); border-radius: 16px; overflow: hidden; position: relative; cursor: pointer; transition: var(--transition-medium); border: 1px solid var(--border-color); }
         .gallery-item:hover { transform: scale(1.05) translateY(-5px); box-shadow: 0 30px 60px rgba(0, 229, 192, 0.2); border-color: var(--accent-cyan); }
         .gallery-item::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 50%, rgba(0, 0, 0, 0.85)); z-index: 1; }
         .gallery-label { position: absolute; bottom: 1.2rem; right: 1.2rem; z-index: 2; font-size: 1rem; color: var(--fg-primary); font-weight: 600; }
-        .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: var(--transition-medium); }
         .gallery-item:hover img { transform: scale(1.1); }
         
         .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; }
@@ -204,7 +189,7 @@
         .leader-photo { width: 130px; height: 130px; border-radius: 50%; margin: 0 auto 1.2rem; position: relative; overflow: hidden; border: 4px solid var(--accent-gold); box-shadow: 0 0 40px rgba(240, 176, 0, 0.5), 0 15px 50px rgba(0, 0, 0, 0.6); transition: var(--transition-medium); background: linear-gradient(135deg, #1a2a3a, #0a1520); }
         .leader-photo::before { content: ''; position: absolute; inset: -4px; border-radius: 50%; background: conic-gradient(from 0deg, var(--accent-gold), var(--accent-cyan), var(--accent-gold), var(--accent-cyan), var(--accent-gold)); z-index: -1; animation: rotateBorder 3s linear infinite; }
         @keyframes rotateBorder { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .leader-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; transition: transform 0.5s ease; }
+        .leader-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; transition: var(--transition-medium); }
         .leader-card:hover .leader-photo { transform: scale(1.08); box-shadow: 0 0 60px rgba(240, 176, 0, 0.7), 0 20px 60px rgba(0, 0, 0, 0.7); }
         .leader-card:hover .leader-photo img { transform: scale(1.05); }
         .leader-photo-cyan { border-color: var(--accent-cyan); box-shadow: 0 0 40px rgba(0, 229, 192, 0.5), 0 15px 50px rgba(0, 0, 0, 0.6); }
@@ -223,28 +208,26 @@
         .task-gold { background: rgba(240, 176, 0, 0.08); border: 1px solid rgba(240, 176, 0, 0.2); }
         .task-blue { background: rgba(0, 153, 238, 0.08); border: 1px solid rgba(0, 153, 238, 0.2); }
         
+        /* Specs Table Styles */
+        .specs-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .specs-table th, .specs-table td { padding: 1rem 1.5rem; text-align: right; border-bottom: 1px solid var(--border-color); }
+        .specs-table thead th { border-bottom: 2px solid var(--accent-cyan); font-weight: 700; }
+        .specs-table tbody tr:hover td { background: rgba(0, 229, 192, 0.03); }
+        .specs-table tbody tr:last-child td { border-bottom: none; }
+        
         .footer { padding: 4rem 2rem; background: var(--bg-primary); border-top: 1px solid var(--border-color); text-align: center; }
         
         .reveal { opacity: 0; transform: translateY(60px); transition: var(--transition-slow); }
         .reveal.active { opacity: 1; transform: translateY(0); }
         
-        /* Back to top button */
-        #backToTop { position: fixed; bottom: 2rem; left: 2rem; width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue)); border: none; cursor: pointer; z-index: 50; opacity: 0; transform: translateY(20px); transition: all 0.3s ease; box-shadow: 0 5px 20px rgba(0, 229, 192, 0.3); display: flex; align-items: center; justify-content: center; }
-        #backToTop:hover { transform: translateY(-3px) scale(1.1); box-shadow: 0 10px 30px rgba(0, 229, 192, 0.5); }
-        
         @media (max-width: 1024px) { .stroke-engine { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 768px) { .stroke-engine { grid-template-columns: 1fr; } .mobile-menu-btn { display: block; } .nav-links { display: none; flex-direction: column; text-align: center; padding: 1rem 0; } .nav-links.active { display: flex; } .nav-logo-img { width: 42px; height: 42px; } .section { padding: 4rem 1.5rem; } .card { padding: 1.5rem; } .leaders-grid { grid-template-columns: 1fr; } .videos-grid { grid-template-columns: 1fr; } }
-        @media (max-width: 480px) { .hero-section { padding: 1.5rem; } .gallery-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .stroke-engine { grid-template-columns: 1fr; } .mobile-menu-btn { display: block; } .nav-links { display: none; flex-direction: column; text-align: center; padding: 1rem 0; } .nav-links.active { display: flex; } .nav-logo { display: none; } .section { padding: 4rem 1.5rem; } .card { padding: 1.5rem; } .leaders-grid { grid-template-columns: 1fr; } .specs-table th, .specs-table td { padding: 0.75rem 1rem; } .gallery-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 480px) { .hero-section { padding: 1.5rem; } }
         @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
         .english-text { direction: ltr; display: inline-block; }
     </style>
 </head>
 <body>
-    <!-- Loader -->
-    <div id="loader">
-        <div class="loader-spinner"></div>
-    </div>
-
     <div class="progress-bar" id="progressBar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
     
     <div class="ambient-orb orb-1" aria-hidden="true"></div>
@@ -255,12 +238,7 @@
     
     <nav class="nav-fixed" id="navbar" role="navigation" aria-label="القائمة الرئيسية">
         <div class="flex justify-between items-center max-w-7xl mx-auto">
-            <div class="flex items-center gap-3">
-                <img src="https://z-cdn-media.chatglm.cn/files/645a1964-cb34-4186-88ca-700736b73e50.png?auth_key=1878888361-991e5d1c390942f4a710ee6919ec50d0-0-36765c0f202fc33b1131582f20a65717" 
-                     alt="شعار المعهد الفني للمنشآت البحرية" 
-                     class="nav-logo-img">
-                <span class="nav-logo">مشروع التخرج</span>
-            </div>
+            <span class="nav-logo">مشروع التخرج</span>
             <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="فتح القائمة" aria-expanded="false">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -271,10 +249,11 @@
             <div class="nav-links" id="navLinks">
                 <a href="#hero" class="nav-link">الرئيسية</a>
                 <a href="#intro" class="nav-link">المجال</a>
-                <a href="#videos" class="nav-link">الفيديوهات</a>
+                <a href="#video" class="nav-link">الفيديوهات</a>
                 <a href="#about" class="nav-link">القسم والمعهد</a>
                 <a href="#project" class="nav-link">المشروع</a>
                 <a href="#strokes" class="nav-link">الأشواط</a>
+                <a href="#specs" class="nav-link">المواصفات</a>
                 <a href="#challenges" class="nav-link">التحديات</a>
                 <a href="#comparison" class="nav-link">قبل وبعد</a>
                 <a href="#gallery" class="nav-link">المعرض</a>
@@ -291,8 +270,8 @@
                 <p class="hero-quote reveal" style="transition-delay: 0.1s;">"في عالم لا تتوقف فيه المحركات عن الدوران…<br>كان علينا أن نعيد الحياة لمحرك توقف عن العمل."</p>
                 <p class="hero-description reveal" style="transition-delay: 0.2s;">مشروع تخرج يهدف إلى إعادة تأهيل محرك محأكات وتحويله إلى نموذج تعليمي تفاعلي يجمع بين الميكانيكا، الكهرباء، البرمجة، والمحاكاة العملية.</p>
                 <div class="flex flex-wrap gap-4 justify-center mt-10 reveal" style="transition-delay: 0.3s;">
-                    <button class="btn-primary" data-scroll-to="project">ابدأ الرحلة</button>
-                    <button class="btn-secondary" data-scroll-to="videos">مشاهدة الفيديوهات</button>
+                    <button class="btn-primary" onclick="scrollToSection('project')">ابدأ الرحلة</button>
+                    <button class="btn-secondary" onclick="scrollToSection('video')">مشاهدة الفيديوهات</button>
                 </div>
             </div>
             <div class="scroll-indicator" aria-hidden="true">
@@ -321,16 +300,20 @@
             </div>
         </section>
         
-        <!-- VIDEOS SECTION -->
-        <section id="videos" class="video-section" aria-labelledby="videos-title">
+        <!-- VIDEO SECTION -->
+        <section id="video" class="video-section" aria-labelledby="video-title">
             <div class="video-container">
-                <h2 id="videos-title" class="section-title reveal text-center" style="display: block;">فيديوهات المشروع</h2>
+                <h2 id="video-title" class="section-title reveal">فيديوهات المشروع</h2>
+                <p class="text-center mb-8 reveal" style="color: var(--fg-muted); max-width: 600px; margin: 0 auto 2rem;">
+                    شاهد الفيديوهات التعريفية التي توضح مراحل المشروع ومكونات المحرك بالتفصيل.
+                </p>
                 
                 <div class="videos-grid">
+                    <!-- Video 1: تعريفي للمشروع -->
                     <div class="video-card reveal">
-                        <div style="padding: 1.5rem;">
+                        <div class="video-card-header">
                             <h3 class="text-xl font-bold mb-2" style="color: var(--accent-cyan);">فيديو تعريفي للمشروع</h3>
-                            <p style="color: var(--fg-muted); font-size: 0.95rem;">شاهد الفيديو التعريفي الذي يوضح مراحل المشروع من البداية حتى النهاية.</p>
+                            <p style="color: var(--fg-muted); font-size: 0.95rem;">مراحل المشروع من البداية حتى النهاية والتحديات التي واجهناها.</p>
                         </div>
                         <div class="video-wrapper" id="videoWrapper1">
                             <div class="video-placeholder" data-video-id="SfclxbXAjmo" tabindex="0" role="button" aria-label="تشغيل الفيديو التعريفي">
@@ -341,12 +324,13 @@
                         </div>
                     </div>
                     
-                    <div class="video-card video-card-gold reveal" style="transition-delay: 0.15s;">
-                        <div style="padding: 1.5rem;">
+                    <!-- Video 2: شرح مكونات المحرك -->
+                    <div class="video-card reveal" style="transition-delay: 0.15s;">
+                        <div class="video-card-header">
                             <h3 class="text-xl font-bold mb-2" style="color: var(--accent-gold);">فيديو شرح مكونات المحرك</h3>
                             <p style="color: var(--fg-muted); font-size: 0.95rem;">شرح تفصيلي لمكونات المحرك وكيفية عمل كل جزء.</p>
                         </div>
-                        <div class="video-wrapper video-wrapper-gold" id="videoWrapper2">
+                        <div class="video-wrapper" id="videoWrapper2">
                             <div class="video-placeholder" data-video-id="ER7UX9XkbSA" tabindex="0" role="button" aria-label="تشغيل فيديو شرح المكونات">
                                 <div class="play-button play-button-gold">
                                     <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
@@ -447,6 +431,49 @@
             </div>
         </section>
         
+        <!-- ENGINE SPECS SECTION -->
+        <section id="specs" class="section section-alt" aria-labelledby="specs-title">
+            <div class="max-w-5xl mx-auto">
+                <h2 id="specs-title" class="section-title reveal">المواصفات الفنية للمحرك</h2>
+                <div class="card reveal overflow-x-auto">
+                    <table class="specs-table">
+                        <thead>
+                            <tr>
+                                <th style="color: var(--accent-cyan);">المواصفة</th>
+                                <th style="color: var(--accent-gold);">القيمة</th>
+                            </tr>
+                        </thead>
+                        <tbody style="color: var(--fg-muted);">
+                            <tr>
+                                <td class="font-semibold" style="color: var(--fg-primary);">نوع المحرك</td>
+                                <td>محرك ديزل بحري رباعي الأشواط</td>
+                            </tr>
+                            <tr>
+                                <td class="font-semibold" style="color: var(--fg-primary);">عدد الاسطوانات</td>
+                                <td>4 اسطوانات</td>
+                            </tr>
+                            <tr>
+                                <td class="font-semibold" style="color: var(--fg-primary);">نظام التبريد</td>
+                                <td>تبريد مائي</td>
+                            </tr>
+                            <tr>
+                                <td class="font-semibold" style="color: var(--fg-primary);">نظام التشحيم</td>
+                                <td>نظام ضغط الزيت</td>
+                            </tr>
+                            <tr>
+                                <td class="font-semibold" style="color: var(--fg-primary);">نظام الحقن</td>
+                                <td>مضخة حقن مباشر</td>
+                            </tr>
+                            <tr>
+                                <td class="font-semibold" style="color: var(--fg-primary);">الاستخدام</td>
+                                <td>تشغيل السفن والقوارب الصغيرة</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+        
         <!-- CHALLENGES SECTION -->
         <section id="challenges" class="section section-gold" aria-labelledby="challenges-title">
             <div class="max-w-6xl mx-auto">
@@ -522,28 +549,38 @@
         <section id="gallery" class="section" aria-labelledby="gallery-title">
             <div class="max-w-6xl mx-auto">
                 <h2 id="gallery-title" class="section-title reveal">معرض الصور</h2>
-                <p class="text-lg mb-10 reveal" style="color: var(--fg-muted); max-width: 700px;">لحظات من رحلة إعادة تأهيل المحرك - من الفك والتجميع إلى التعلم والتعاون الجماعي</p>
+                <p class="text-center mb-8 reveal" style="color: var(--fg-muted); max-width: 600px; margin: 0 auto 2rem;">
+                    توثيق مراحل العمل على المشروع من البداية حتى النهاية
+                </p>
                 <div class="gallery-grid">
-                    <div class="gallery-item reveal" tabindex="0" role="button" aria-label="التعلم والتعاون حول المحرك">
-                        <img src="WhatsApp%20Image%202026-05-09%20at%204.10.23%20PM.jpeg" alt="الفريق يتعلم ويتعاون حول المحرك أثناء مرحلة التشغيل والاختبار" loading="lazy">
-                        <span class="gallery-label">التعلم والتعاون حول المحرك</span>
+                    
+                    <!-- تم إزالة صورة "العمل في الورشة" -->
+                    
+                    <div class="gallery-item reveal" tabindex="0" role="button" aria-label="فريق العمل أثناء التجميع">
+                        <img src="https://z-cdn-media.chatglm.cn/files/612c6a47-640f-4a26-a27b-07e0f40a1d52.jpeg?auth_key=1878901297-1b8013fb586f40738784ec97a82d91a3-0-61e13668462ddad86d0ee58c62701ad2" alt="فريق العمل أثناء تجميع المحرك" loading="lazy">
+                        <span class="gallery-label">فريق العمل أثناء التجميع</span>
                     </div>
-                    <div class="gallery-item reveal" style="transition-delay: 0.1s;" tabindex="0" role="button" aria-label="فك وتجميع الأجزاء الميكانيكية">
-                        <img src="WhatsApp%20Image%202026-05-09%20at%204.10.25%20PM%20(3).jpeg" alt="الفريق يقوم بفك وتجميع الأجزاء الميكانيكية للمحرك باستخدام الأدوات" loading="lazy">
-                        <span class="gallery-label">فك وتجميع الأجزاء الميكانيكية</span>
+                    
+                    <div class="gallery-item reveal" style="transition-delay: 0.1s;" tabindex="0" role="button" aria-label="التعاون الجماعي">
+                        <img src="https://z-cdn-media.chatglm.cn/files/7a7750ae-eec1-43c9-994b-b06a1f71142b.jpeg?auth_key=1878901297-5f742bf5225f448499297349f612fc0b-0-88ef7c6def76d31a5b8d58fbe4fc900a" alt="التعاون الجماعي على المشروع" loading="lazy">
+                        <span class="gallery-label">التعاون الجماعي</span>
                     </div>
-                    <div class="gallery-item reveal" style="transition-delay: 0.2s;" tabindex="0" role="button" aria-label="الشرح العملي لمكونات المحرك">
-                        <img src="WhatsApp%20Image%202026-05-09%20at%204.10.25%20PM%20(4).jpeg" alt="الشرح العملي لمكونات المحرك والتعاون الفني بين أعضاء الفريق" loading="lazy">
-                        <span class="gallery-label">الشرح العملي لمكونات المحرك</span>
+                    
+                    <div class="gallery-item reveal" style="transition-delay: 0.2s;" tabindex="0" role="button" aria-label="العمل على الأجزاء الميكانيكية">
+                        <img src="https://z-cdn-media.chatglm.cn/files/6c52ae10-715d-44fc-b684-eec993a2fff3.jpeg?auth_key=1878901297-15fd586963e64d7989a0fdfe61eb8243-0-1ae7f9b523eaecaa250e0541f9f780ea" alt="العمل على الأجزاء الميكانيكية" loading="lazy">
+                        <span class="gallery-label">العمل على الأجزاء الميكانيكية</span>
                     </div>
-                    <div class="gallery-item reveal" style="transition-delay: 0.3s;" tabindex="0" role="button" aria-label="الصيانة والإصلاح">
-                        <img src="WhatsApp%20Image%202026-05-09%20at%204.10.25%20PM%20(5).jpeg" alt="عمليات الصيانة والإصلاح لأجزاء المحرك الداخلية" loading="lazy">
-                        <span class="gallery-label">الصيانة والإصلاح</span>
+                    
+                    <div class="gallery-item reveal" style="transition-delay: 0.3s;" tabindex="0" role="button" aria-label="ورشة العمل والصيانة">
+                        <img src="https://z-cdn-media.chatglm.cn/files/7be8e886-591a-4a2a-ba80-d6b1ba9bb28b.jpeg?auth_key=1878901297-1b07b5a087e54a3790366eaa5b294ecb-0-60399396fe21163d1f23a173bbd8851d" alt="ورشة العمل والصيانة" loading="lazy">
+                        <span class="gallery-label">ورشة العمل والصيانة</span>
                     </div>
-                    <div class="gallery-item reveal" style="transition-delay: 0.4s;" tabindex="0" role="button" aria-label="العمل الجماعي على المحرك">
-                        <img src="WhatsApp%20Image%202026-05-09%20at%204.10.26%20PM%20(1).jpeg" alt="العمل الجماعي على تجميع وإصلاح أجزاء المحرك" loading="lazy">
-                        <span class="gallery-label">العمل الجماعي على المحرك</span>
+                    
+                    <div class="gallery-item reveal" style="transition-delay: 0.4s;" tabindex="0" role="button" aria-label="العمل الجماعي في الورشة">
+                        <img src="https://z-cdn-media.chatglm.cn/files/889ea8a2-f1b2-4069-a99a-8539ceef754f.jpeg?auth_key=1878901297-3afcda35d70143fdafd396ba450d82d9-0-d927f47ddb50f2eea0ce05fb6efc5ed1" alt="العمل الجماعي في الورشة" loading="lazy">
+                        <span class="gallery-label">العمل الجماعي في الورشة</span>
                     </div>
+                    
                 </div>
             </div>
         </section>
@@ -641,9 +678,6 @@
         <!-- FOOTER -->
         <footer class="footer" role="contentinfo">
             <div class="max-w-4xl mx-auto">
-                <div class="mb-6">
-                    <img src="https://z-cdn-media.chatglm.cn/files/645a1964-cb34-4186-88ca-700736b73e50.png?auth_key=1878888361-991e5d1c390942f4a710ee6919ec50d0-0-36765c0f202fc33b1131582f20a65717" alt="شعار المعهد" style="width: 70px; height: 70px; object-fit: contain; margin: 0 auto 1rem; display: block; filter: drop-shadow(0 0 10px rgba(0, 229, 192, 0.3));">
-                </div>
                 <p class="text-xl mb-3 font-bold" style="color: var(--accent-cyan);">المعهد الفني للمنشآت البحرية ببورسعيد</p>
                 <p class="text-lg mb-8" style="color: var(--fg-muted);">قسم ميكنة وتشغيل السفن</p>
                 <div class="pt-8 border-t" style="border-color: var(--border-color);">
@@ -653,11 +687,6 @@
         </footer>
     </main>
     
-    <!-- Back to Top Button -->
-    <button id="backToTop" aria-label="العودة للأعلى">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--bg-deep)" stroke-width="3"><path d="M18 15l-6-6-6 6"/></svg>
-    </button>
-    
     <script type="module">
         import * as THREE from 'three';
         
@@ -666,7 +695,6 @@
         const navbar = document.getElementById('navbar');
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const navLinks = document.getElementById('navLinks');
-        const backToTopBtn = document.getElementById('backToTop');
         
         let scene = null;
         let camera = null;
@@ -677,15 +705,6 @@
         
         const clock = new THREE.Clock();
         const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        
-        // Loader
-        window.addEventListener('load', () => {
-            const loader = document.getElementById('loader');
-            if (loader) {
-                loader.style.opacity = '0';
-                setTimeout(() => loader.remove(), 500);
-            }
-        });
         
         function initThree() {
             if (!canvas) return;
@@ -759,21 +778,8 @@
             const scrollPercent = Math.max(0, Math.min(100, (scrollTop / docHeight) * 100));
             progressBar.style.width = scrollPercent + '%';
             progressBar.setAttribute('aria-valuenow', Math.round(scrollPercent));
-            
-            // Navbar visibility
             if (scrollTop > 150) navbar.classList.add('visible');
             else navbar.classList.remove('visible');
-            
-            // Back to top button
-            if (backToTopBtn) {
-                if (scrollTop > 500) {
-                    backToTopBtn.style.opacity = '1';
-                    backToTopBtn.style.transform = 'translateY(0)';
-                } else {
-                    backToTopBtn.style.opacity = '0';
-                    backToTopBtn.style.transform = 'translateY(20px)';
-                }
-            }
         }
         
         function initScrollReveal() {
@@ -800,8 +806,7 @@
                     if (!videoLoaded) {
                         const iframe = document.createElement('iframe');
                         iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
-                        const cardTitle = wrapper.closest('.video-card')?.querySelector('h3')?.textContent || 'فيديو المشروع';
-                        iframe.title = cardTitle;
+                        iframe.title = placeholder.getAttribute('aria-label');
                         iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
                         iframe.allowFullscreen = true;
                         wrapper.appendChild(iframe);
@@ -840,23 +845,10 @@
                     }
                 });
             });
-            
-            document.querySelectorAll('[data-scroll-to]').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const targetId = btn.getAttribute('data-scroll-to');
-                    const target = document.getElementById(targetId);
-                    if (target) {
-                        target.scrollIntoView({ behavior: 'smooth' });
-                    }
-                });
-            });
-        }
-        
-        function initBackToTop() {
-            if (!backToTopBtn) return;
-            backToTopBtn.addEventListener('click', () => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
+            window.scrollToSection = function(id) {
+                const element = document.getElementById(id);
+                if (element) element.scrollIntoView({ behavior: 'smooth' });
+            };
         }
         
         initThree();
@@ -864,8 +856,6 @@
         initVideos();
         initMobileMenu();
         initSmoothScroll();
-        initBackToTop();
-        
         window.addEventListener('resize', onWindowResize);
         window.addEventListener('mousemove', onMouseMove);
         window.addEventListener('scroll', onScroll);
